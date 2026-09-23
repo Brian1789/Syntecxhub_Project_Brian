@@ -1,0 +1,164 @@
+/// Cleaned transaction-level sales data from analysis_output/cleaned_sales_data.csv.
+table Sales
+	lineageTag: 3a7a071a-084f-44e9-a3e6-69eb7fc831d6
+
+	measure 'Total Revenue' = SUM(Sales[Revenue])
+		formatString: $#,##0.00
+		lineageTag: e6470fff-d5f9-4a7a-a6c9-2d610664e830
+
+	measure 'Total Profit' = SUM(Sales[Profit])
+		formatString: $#,##0.00
+		lineageTag: 5a72a592-5afe-4ac2-a9b5-2439b2ba2ca2
+
+	measure 'Profit Margin' = DIVIDE([Total Profit], [Total Revenue])
+		formatString: 0.00%
+		lineageTag: 609097af-0fbb-4cae-a741-4b8ff63597d8
+
+	measure Transactions = COUNTROWS(Sales)
+		formatString: #,##0
+		lineageTag: 7220f738-ca35-4673-9094-d927b07ca2e4
+
+	measure 'Quantity Sold' = SUM(Sales[Quantity_Sold])
+		formatString: #,##0
+		lineageTag: d49c8863-11ab-4ede-9e19-885f1a2b870f
+
+	measure 'Average Transaction Revenue' = DIVIDE([Total Revenue], [Transactions])
+		formatString: $#,##0.00
+		lineageTag: c49d8c13-6ca3-46ce-960f-0d12791e27be
+
+	measure 'Revenue Growth Rate' =
+			VAR CurrentRevenue = [Total Revenue]
+			VAR PriorRevenue = CALCULATE([Total Revenue], DATEADD(Sales[Sale_Date], -1, MONTH))
+			RETURN DIVIDE(CurrentRevenue - PriorRevenue, PriorRevenue)
+		formatString: 0.00%
+		lineageTag: f742e74e-7e34-442e-ae51-db1fe4718cac
+
+	measure 'Average Discount' = AVERAGE(Sales[Discount])
+		formatString: 0.00%
+		lineageTag: 0bfc70f4-71ee-462b-8b82-7c64c9cf3255
+
+	column Product_ID
+		dataType: int64
+		lineageTag: 829b2882-6e43-4a5d-b2a2-ee8621b540c0
+		summarizeBy: count
+		sourceColumn: Product_ID
+
+	column Sale_Date
+		dataType: dateTime
+		lineageTag: 55806097-d69a-4a48-9810-35e6a433e831
+		dataCategory: PaddedDateTableDates
+		sourceColumn: Sale_Date
+
+	column Sales_Rep
+		dataType: string
+		lineageTag: 7764aa0a-3e18-4c55-ae74-1c36e2149f11
+		sourceColumn: Sales_Rep
+
+	column Region
+		dataType: string
+		lineageTag: 3eb28e43-18a0-4088-a783-fc91c5cece89
+		sourceColumn: Region
+
+	column Sales_Amount
+		dataType: double
+		formatString: $#,##0.00
+		lineageTag: 2daf968c-f406-4de8-af29-7eff2abf0bf5
+		sourceColumn: Sales_Amount
+
+	column Quantity_Sold
+		dataType: int64
+		lineageTag: 8328bdb8-cc0f-4ca2-acdf-c57afd82551e
+		summarizeBy: sum
+		sourceColumn: Quantity_Sold
+
+	column Product_Category
+		dataType: string
+		lineageTag: cac604df-0dc1-4126-93b9-de3b77f79138
+		sourceColumn: Product_Category
+
+	column Unit_Cost
+		dataType: double
+		formatString: $#,##0.00
+		lineageTag: 95f3541c-24b1-48bd-8cba-6c62e1b7d3f9
+		sourceColumn: Unit_Cost
+
+	column Unit_Price
+		dataType: double
+		formatString: $#,##0.00
+		lineageTag: 18c3438d-c0c9-460d-90da-ddd8422e1cd7
+		sourceColumn: Unit_Price
+
+	column Customer_Type
+		dataType: string
+		lineageTag: 80d477bc-d209-4ceb-896f-6ab8e89b2807
+		sourceColumn: Customer_Type
+
+	column Discount
+		dataType: double
+		formatString: 0.00%
+		lineageTag: 50ebd437-2b12-4025-bbf4-901e9d032e90
+		sourceColumn: Discount
+
+	column Payment_Method
+		dataType: string
+		lineageTag: 05355a47-fde7-48db-8c34-7dd77b435862
+		sourceColumn: Payment_Method
+
+	column Sales_Channel
+		dataType: string
+		lineageTag: e80c6e4b-a8f3-484d-b588-8fbf55d31b36
+		sourceColumn: Sales_Channel
+
+	column Region_and_Sales_Rep
+		dataType: string
+		lineageTag: daeb7479-53e6-4eb2-9a80-3614ec3c6342
+		sourceColumn: Region_and_Sales_Rep
+
+	column Revenue
+		dataType: double
+		formatString: $#,##0.00
+		lineageTag: 4b42810e-fdb1-4dfc-8737-e2e077db1df3
+		sourceColumn: Revenue
+
+	column Cost
+		dataType: double
+		formatString: $#,##0.00
+		lineageTag: 0c318046-c10a-4a81-9615-16522ff3f224
+		sourceColumn: Cost
+
+	column Profit
+		dataType: double
+		formatString: $#,##0.00
+		lineageTag: 56067d60-1bcc-4faf-b7fa-a1bad563d0d1
+		sourceColumn: Profit
+
+	column Profit_Margin
+		dataType: double
+		formatString: 0.00%
+		lineageTag: 6903fcbf-adfb-4e5a-8694-cecd66a9bf1c
+		sourceColumn: Profit_Margin
+
+	column Month
+		dataType: string
+		lineageTag: 92cf4923-79f7-498b-b4d0-f027a917caab
+		sourceColumn: Month
+
+	column Quarter
+		dataType: string
+		lineageTag: a839c277-51a5-46ec-9e88-389414a41d7f
+		sourceColumn: Quarter
+
+	column Year
+		dataType: string
+		lineageTag: 078666db-8b94-44db-bc7d-5497588a939c
+		sourceColumn: Year
+
+	partition Sales = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\ADMIN\Downloads\archive\analysis_output\cleaned_sales_data.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true])
+				in
+				    PromotedHeaders
+

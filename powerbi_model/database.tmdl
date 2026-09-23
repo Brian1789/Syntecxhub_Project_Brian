@@ -1,0 +1,5 @@
+/// Interactive sales dashboard semantic model built from the cleaned sales dataset.
+database SalesDashboard
+	compatibilityLevel: 1600
+	language: 1033
+
